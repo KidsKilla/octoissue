@@ -32,11 +32,12 @@ export const issueSlice = createSlice({
       .addCase(fetchIssues.fulfilled, (state, action) => {
         state.request.status = action.meta.requestStatus
         state.request.error = null
+        state.data = issueAdapter.removeAll(state.data)
         state.data = issueAdapter.addMany(state.data, action)
       })
       .addCase(fetchIssues.rejected, (state, action) => {
         state.request.status = action.meta.requestStatus
         state.request.error = createErrorByActionError(action.error)
-        // state.data = INITIAL_STATE.data
+        state.data = issueAdapter.removeAll(state.data)
       }),
 })

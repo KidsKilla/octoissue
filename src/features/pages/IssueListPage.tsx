@@ -7,6 +7,7 @@ import {
   Pagination,
   DataTable,
   Text,
+  Layer,
 } from 'grommet'
 import { Link } from 'react-router-dom'
 import { PageBody } from '../../components/PageBody'
@@ -25,6 +26,8 @@ export const IssueListPage: React.VFC = () => {
   return <RepoMissing />
 }
 
+const PAGE_SIZE = 3
+
 export const IssueListPageOK: React.VFC<GHRepoData> = (props) => {
   const [currentPage, setPage] = useState(1)
   const { allIssues, request, fetchIssues } = useGHIssues()
@@ -38,7 +41,7 @@ export const IssueListPageOK: React.VFC<GHRepoData> = (props) => {
       owner: props.owner,
       repo: props.repo,
       currentPage,
-      pageSize: 30,
+      pageSize: PAGE_SIZE,
     })
   }, [currentPage, prevPage, fetchIssues, props.owner, props.repo])
 
@@ -52,7 +55,21 @@ export const IssueListPageOK: React.VFC<GHRepoData> = (props) => {
           Request error: {request.error.name}: {request.error.message}
         </Paragraph>
       )}
-      {request.status === 'pending' && <Spinner />}
+      {request.status === 'pending' && (
+        <Layer animation="slide">
+          <Box
+            align="center"
+            justify="center"
+            gap="small"
+            direction="row"
+            alignSelf="center"
+            pad="large"
+          >
+            <Spinner />
+            <Text>Loading...</Text>
+          </Box>
+        </Layer>
+      )}
       {request.status === 'fulfilled' && allIssues.length === 0 && (
         <Paragraph>
           No issues in {props.owner}/{props.repo}!
@@ -61,13 +78,9 @@ export const IssueListPageOK: React.VFC<GHRepoData> = (props) => {
       {allIssues.length > 0 ? (
         <AllIssues
           issues={allIssues}
-          totalCount={data?.open_issues_count || 0}
-          pageSize={30}
+          pagesCount={(data?.open_issues_count || 0) / PAGE_SIZE}
           currentPage={currentPage}
-          onChange={(x) => {
-            console.log('xxx', x)
-            setPage(x)
-          }}
+          onChange={setPage}
         />
       ) : undefined}
     </PageBody>
@@ -76,14 +89,13 @@ export const IssueListPageOK: React.VFC<GHRepoData> = (props) => {
 
 const AllIssues: React.VFC<{
   issues: GHIssue[]
-  totalCount: number
-  pageSize: number
+  pagesCount: number
   currentPage: number
   onChange: (page: number) => void
 }> = (props) => {
   const pagination = (
     <Pagination
-      numberItems={Math.floor(props.totalCount / props.pageSize)}
+      numberItems={props.pagesCount}
       page={props.currentPage}
       numberEdgePages={2}
       onChange={(evt) => props.onChange(evt.page)}
