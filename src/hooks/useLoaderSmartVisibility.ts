@@ -4,7 +4,7 @@ import { usePrevious } from './usePrevious'
 export const useLoaderSmartVisibility = (
   isLoading: boolean,
   { minTimeout } = {
-    minTimeout: 1000,
+    minTimeout: 500,
   },
 ) => {
   const now = Date.now()

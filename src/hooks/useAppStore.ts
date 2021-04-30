@@ -1,24 +1,19 @@
 import { useMemo } from 'react'
-import { useHistory } from 'react-router'
-import { fetchRepoData } from '../app-logic/api'
 import { createStore } from '../app-logic/createStore'
-import { AppNavParams } from '../features/AppNavParams'
+import { uiSlice } from './useCurrentPage'
 
-export const useAppStore = () => {
-  const history = useHistory<AppNavParams>()
-  const store = useMemo(
+declare module 'react-redux' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultRootState {
+    ui: ReturnType<typeof uiSlice.reducer>
+  }
+}
+
+export const useAppStore = () =>
+  useMemo(
     () =>
       createStore({
-        ui: (_state, action) => {
-          if (fetchRepoData.fulfilled.match(action)) {
-            Promise.resolve().then(() => {
-              history.push('/issues')
-            })
-          }
-          return null
-        },
+        ui: uiSlice.reducer,
       }),
-    [history],
+    [],
   )
-  return store
-}

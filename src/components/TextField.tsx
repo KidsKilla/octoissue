@@ -11,6 +11,7 @@ export const TextField: React.VFC<{
     name={props.name}
     htmlFor={`id-of-${props.name}`}
     label={props.name}
+    required
   >
     <TextInput
       id={`id-of-${props.name}`}

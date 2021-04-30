@@ -21,7 +21,8 @@ export const rootSelect: {
 }
 
 declare module 'react-redux' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface DefaultRootState extends AppState {
-    z?: never
+    //
   }
 }

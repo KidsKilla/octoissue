@@ -1,6 +1,7 @@
 import React from 'react'
+import { useHistory } from 'react-router'
 import { useParams } from 'react-router-dom'
-import { Heading, Markdown } from 'grommet'
+import { Heading, Markdown, Anchor, Text } from 'grommet'
 import { AppNavParams } from '../AppNavParams'
 import { GHRepoData } from '../../app-logic/GHRepoData'
 import { PageBody } from '../../components/PageBody'
@@ -19,9 +20,16 @@ export const IssuePage: React.VFC = () => {
 export const IssuePageOK: React.VFC<GHRepoData> = () => {
   const { issueId } = useParams<AppNavParams['issue']>()
   const { issue } = useOneGHIssue(issueId)
+  const { goBack } = useHistory()
   return (
     <PageBody>
-      <Heading>Issue id: {issueId}</Heading>
+      <Heading>
+        Issue id: {issueId}
+        <br />
+        <Text>
+          <Anchor onClick={goBack}>&larr; Go back</Anchor>
+        </Text>
+      </Heading>
       {issue?.body && <Markdown>{issue?.body}</Markdown>}
     </PageBody>
   )

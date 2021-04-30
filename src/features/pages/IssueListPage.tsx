@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import {
   Heading,
   Box,
@@ -12,12 +12,12 @@ import { Link } from 'react-router-dom'
 import { PageBody } from '../../components/PageBody'
 import { useGHRepoData } from '../../hooks/useGHRepoData'
 import { useGHIssues } from '../../hooks/useGHIssues'
-import { usePrevious } from '../../hooks/usePrevious'
 import { useLoaderSmartVisibility } from '../../hooks/useLoaderSmartVisibility'
 import { GHIssue } from '../../app-logic/store.issue'
 import { RepoMissing } from '../../components/RepoMissing'
 import { GHRepoData } from '../../app-logic/GHRepoData'
 import { LoadingIndicator } from '../../components/LoadingIndicator'
+import { useCurrentPage } from '../../hooks/useCurrentPage'
 
 export const IssueListPage: React.VFC = () => {
   const { owner, repo } = useGHRepoData()
@@ -27,24 +27,22 @@ export const IssueListPage: React.VFC = () => {
   return <RepoMissing />
 }
 
-const PAGE_SIZE = 3
+const PAGE_SIZE = 5
 
 export const IssueListPageOK: React.VFC<GHRepoData> = (props) => {
-  const [currentPage, setPage] = useState(1)
+  const { currentPage, isCached, setCurrentPage } = useCurrentPage()
   const { allIssues, request, fetchIssues } = useGHIssues()
   const openIssuesCount = useGHRepoData().data?.open_issues_count || 0
-  const prevPage = usePrevious(currentPage)
   useEffect(() => {
-    if (currentPage === prevPage) {
-      return
+    if (!isCached) {
+      fetchIssues({
+        owner: props.owner,
+        repo: props.repo,
+        currentPage,
+        pageSize: PAGE_SIZE,
+      })
     }
-    fetchIssues({
-      owner: props.owner,
-      repo: props.repo,
-      currentPage,
-      pageSize: PAGE_SIZE,
-    })
-  }, [currentPage, prevPage, fetchIssues, props.owner, props.repo])
+  }, [currentPage, isCached, fetchIssues, props.owner, props.repo])
 
   return (
     <PageBody>
@@ -74,7 +72,7 @@ export const IssueListPageOK: React.VFC<GHRepoData> = (props) => {
               numberItems={openIssuesCount}
               step={PAGE_SIZE}
               page={currentPage}
-              onChange={(evt) => setPage(evt.page)}
+              onChange={(evt) => setCurrentPage(evt.page)}
             />
           )}
           issues={allIssues}

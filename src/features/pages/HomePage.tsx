@@ -5,6 +5,7 @@ import { GHRepoData } from '../../app-logic/GHRepoData'
 import { PageBody } from '../../components/PageBody'
 import { TextField } from '../../components/TextField'
 import { Alert } from '../../components/Alert'
+import { useHistory } from 'react-router'
 
 const EXAMPLES: GHRepoData[] = [
   'facebook/react',
@@ -20,6 +21,7 @@ export const HomePage: React.FC = () => {
     owner,
     repo,
   })
+  const { push } = useHistory()
   return (
     <PageBody>
       <Heading>Welcome to octoissue!</Heading>
@@ -42,16 +44,11 @@ export const HomePage: React.FC = () => {
         />
       )}
       <Form<GHRepoData>
-        method="GET"
-        action="/issues"
-        onSubmit={({ value }) => {
-          if (!value.owner.trim()) {
-            return
-          }
-          if (!value.repo.trim()) {
-            return
-          }
-          updateRepoData(value.owner.trim(), value.repo.trim())
+        validate="blur"
+        onSubmit={(evt) => {
+          evt.preventDefault()
+          updateRepoData(evt.value.owner.trim(), evt.value.repo.trim())
+          push('/issues')
         }}
       >
         <TextField
