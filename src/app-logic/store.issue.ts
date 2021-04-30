@@ -3,7 +3,10 @@ import { createEntityAdapter, createSlice } from '@reduxjs/toolkit'
 import { fetchIssues, fetchRepoData, RequestState } from './api'
 import { createErrorByActionError } from '../lib/createErrorByActionError'
 
-export type GHIssue = RestEndpointMethodTypes['issues']['listForRepo']['response']['data'][0]
+export type GHIssue = Pick<
+  RestEndpointMethodTypes['issues']['listForRepo']['response']['data'][0],
+  'title' | 'body' | 'number'
+>
 
 export const issueAdapter = createEntityAdapter<GHIssue>({
   selectId: (itm) => itm.number,

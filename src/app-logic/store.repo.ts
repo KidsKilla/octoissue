@@ -4,7 +4,10 @@ import { fetchRepoData, RequestState } from './api'
 import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods'
 import { createErrorByActionError } from '../lib/createErrorByActionError'
 
-export type GHRepoAPIData = RestEndpointMethodTypes['repos']['get']['response']['data']
+export type GHRepoAPIData = Pick<
+  RestEndpointMethodTypes['repos']['get']['response']['data'],
+  'open_issues_count'
+>
 
 export type GHRepoState =
   | GHRepoData
@@ -36,6 +39,7 @@ export const repoSlice = createSlice({
         state.request.status = action.meta.requestStatus
         state.request.id = action.meta.requestId
         state.params = action.meta.arg
+        state.request.error = null
       })
       .addCase(fetchRepoData.fulfilled, (state, action) => {
         state.request.status = action.meta.requestStatus

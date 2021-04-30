@@ -18,6 +18,7 @@ export const fetchIssuesAPI = async (
     owner: params.owner,
     repo: params.repo,
     state: 'open',
+    page: params.currentPage,
     per_page: params.pageSize,
   })
   return response.data

@@ -1,37 +1,42 @@
 import { DefaultRootState } from 'react-redux'
 import { createStore } from './createStore'
-import { fetchIssues } from './api'
+import { fetchIssues, fetchRepoData } from './api'
 import MOCK_RESPONSES from './mock/issues.mock.json'
 import { issueAdapter } from './store.issue'
 import { rootSelect } from './reducerMap'
 
 const testStore = createStore()
+const { dispatch, getState } = testStore
 const createArgs = (currentPage = 1) => ({
   currentPage,
   owner: 'test.ownr',
   repo: 'test.repo',
+  pageSize: 3,
 })
 
-const sel = issueAdapter.getSelectors(
+const { selectAll } = issueAdapter.getSelectors(
   (state: DefaultRootState) => rootSelect.issue(state).data,
 )
 
+const GH_ISSUES = MOCK_RESPONSES.map((it) => it.response)
+
 describe('issueSlice', () => {
   it('Updates', () => {
-    testStore.dispatch(
-      // @ts-expect-error null vs undefined
-      fetchIssues.fulfilled(MOCK_RESPONSES[0].response, '1', createArgs()),
-    )
-    expect(sel.selectAll(testStore.getState())).toStrictEqual(
-      MOCK_RESPONSES[0].response,
-    )
+    // @ts-expect-error null vs undefined
+    dispatch(fetchIssues.fulfilled(GH_ISSUES[0], 'id1', createArgs()))
+    expect(selectAll(getState())).toStrictEqual(GH_ISSUES[0])
 
-    testStore.dispatch(
-      // @ts-expect-error null vs undefined
-      fetchIssues.fulfilled(MOCK_RESPONSES[1].response, '2', createArgs(2)),
-    )
-    expect(sel.selectAll(testStore.getState())).toStrictEqual(
-      MOCK_RESPONSES[1].response,
-    )
+    // @ts-expect-error null vs undefined
+    dispatch(fetchIssues.fulfilled(GH_ISSUES[1], 'id2', createArgs(2)))
+    expect(selectAll(getState())).toStrictEqual(GH_ISSUES[1])
+  })
+
+  it('Resets on data update', () => {
+    // @ts-expect-error null vs undefined
+    dispatch(fetchIssues.fulfilled(GH_ISSUES[0], 'i1', createArgs()))
+    expect(selectAll(getState())).toStrictEqual(GH_ISSUES[0])
+
+    dispatch(fetchRepoData.pending('rd1', createArgs()))
+    expect(selectAll(getState())).toStrictEqual([])
   })
 })
