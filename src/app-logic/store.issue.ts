@@ -1,7 +1,10 @@
 import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods'
-import { createEntityAdapter, createSlice } from '@reduxjs/toolkit'
+import {
+  createEntityAdapter,
+  createSlice,
+  SerializedError,
+} from '@reduxjs/toolkit'
 import { fetchIssues, fetchRepoData, RequestState } from './api'
-import { createErrorByActionError } from '../lib/createErrorByActionError'
 
 export type GHIssue = Pick<
   RestEndpointMethodTypes['issues']['listForRepo']['response']['data'][0],
@@ -16,7 +19,7 @@ const INITIAL_STATE = {
   request: {
     id: null as null | string,
     status: 'none' as RequestState,
-    error: null as null | Error,
+    error: null as null | SerializedError,
   },
   data: issueAdapter.getInitialState(),
 }
@@ -40,7 +43,7 @@ export const issueSlice = createSlice({
       })
       .addCase(fetchIssues.rejected, (state, action) => {
         state.request.status = action.meta.requestStatus
-        state.request.error = createErrorByActionError(action.error)
+        state.request.error = action.error
         state.data = issueAdapter.removeAll(state.data)
       }),
 })

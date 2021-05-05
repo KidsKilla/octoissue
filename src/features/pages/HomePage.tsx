@@ -39,7 +39,7 @@ export const HomePage: React.FC = () => {
       {request.error && (
         <Alert
           title={`Failed to load ${owner}/${repo}`}
-          message={request.error.message}
+          message={request.error.message || ''}
           footer="Please, verify if names are valid"
         />
       )}

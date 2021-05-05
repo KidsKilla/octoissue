@@ -51,7 +51,8 @@ export const IssueListPageOK: React.VFC<GHRepoData> = (props) => {
       </Heading>
       {request.error && (
         <Paragraph>
-          Request error: {request.error.name}: {request.error.message}
+          Request error: {request.error.name || 'FetchError'}:{' '}
+          {request.error.message || ''}
         </Paragraph>
       )}
       <LoadingIndicator

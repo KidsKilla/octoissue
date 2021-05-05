@@ -1,8 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, SerializedError } from '@reduxjs/toolkit'
+import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods'
 import { GHRepoData } from './GHRepoData'
 import { fetchRepoData, RequestState } from './api'
-import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods'
-import { createErrorByActionError } from '../lib/createErrorByActionError'
 
 export type GHRepoAPIData = Pick<
   RestEndpointMethodTypes['repos']['get']['response']['data'],
@@ -23,7 +22,7 @@ const INITIAL_STATE = {
   } as GHRepoState,
   request: {
     status: 'none' as RequestState,
-    error: null as null | Error,
+    error: null as null | SerializedError,
     id: null as null | string,
   },
   data: null as null | GHRepoAPIData,
@@ -47,6 +46,6 @@ export const repoSlice = createSlice({
       })
       .addCase(fetchRepoData.rejected, (state, action) => {
         state.request.status = action.meta.requestStatus
-        state.request.error = createErrorByActionError(action.error)
+        state.request.error = action.error
       }),
 })

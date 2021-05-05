@@ -1,9 +1,8 @@
-import { DefaultRootState } from 'react-redux'
 import { createStore } from './createStore'
 import { fetchIssues, fetchRepoData } from './api'
 import MOCK_RESPONSES from './mock/issues.mock.json'
 import { issueAdapter } from './store.issue'
-import { rootSelect } from './reducerMap'
+import { rootSelect, AppState } from './reducerMap'
 
 const testStore = createStore()
 const { dispatch, getState } = testStore
@@ -15,7 +14,7 @@ const createArgs = (currentPage = 1) => ({
 })
 
 const { selectAll } = issueAdapter.getSelectors(
-  (state: DefaultRootState) => rootSelect.issue(state).data,
+  (state: AppState) => rootSelect.issue(state).data,
 )
 
 const GH_ISSUES = MOCK_RESPONSES.map((it) => it.response)
