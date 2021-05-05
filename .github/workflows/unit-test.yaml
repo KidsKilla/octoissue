@@ -1,22 +1,47 @@
-name: Unit test
+name: Unit test, linting, etc
 on: [push]
 jobs:
-  Unit-test:
+  Setup:
     runs-on: ubuntu-latest
     env:
       NODE_VERSION: '12.x'
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-
       - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ env.NODE_VERSION }}
-
       - run: yarn install
+      - run: ls ${{ github.workspace }}
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: src
+          path: '.'
+          retention-days: 1
+  Unit_test:
+    needs: Setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download src
+        uses: actions/download-artifact@v2
+        with:
+          name: src
       - run: ls ${{ github.workspace }}
       - run: echo "🎉 Run unit tests"
       - run: yarn test
+      - run: echo "result - ${{ job.status }}"
+
+  Lint:
+    needs: Setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download src
+        uses: actions/download-artifact@v2
+        with:
+          name: src
+      - run: ls ${{ github.workspace }}
+      - run: echo "🎉 Lint is all!"
       - run: yarn run lint
-      - run: echo "🍏 Tests are ${{ job.status }}."
+      - run: echo "result - ${{ job.status }}"
